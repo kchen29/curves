@@ -29,7 +29,7 @@
 (defun plot (x y screen color)
   "Plots (x, y) on the 2D array SCREEN with COLOR.
    Floors x and y. Checks bounds. COLOR is not copied."
-  (setf x (floor x) y (floor y))
+  (setf x (round x) y (round y))
   (when (and (< -1 x (array-dimension screen 0)) (< -1 y (array-dimension screen 1)))
     (setf (aref screen x y) color)))
 

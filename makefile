@@ -7,5 +7,8 @@ all:
 test:
 	$(sbcl) '(main-test)'
 
+image:
+	$(sbcl) '(main "shrug")'
+
 clean:
 	rm -f *~ *.fasl *.ppm *.png
