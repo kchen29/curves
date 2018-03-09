@@ -54,6 +54,9 @@
       (let ((args (parse-args (next-line stream))))
         (switch line #'string=
           ("line" (apply #'add-edge edges args))
+          ("circle" (apply #'draw-circle edges .01 args))
+          ("hermite" (apply #'draw-hermite edges .01 args))
+          ("bezier" (apply #'draw-bezier edges .01 args))
           ("scale" (apply #'scale (append args (list transform))))
           ("move" (apply #'translate (append args (list transform))))
           ("rotate" (apply #'rotate (append args (list transform))))
