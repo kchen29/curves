@@ -1,11 +1,11 @@
-main := (main)
-sbcl := sbcl --noinform --non-interactive
+sbcl := sbcl --noinform --non-interactive --load "load.lisp" --eval
+script := "script"
 
 all:
-	$(sbcl) --load "load.lisp" --eval '(progn $(main))'
+	$(sbcl) '(main $(script))'
 
-circles:
-	$(sbcl) --load "load.lisp" --load "script.lisp" --eval '(main-script)'
+test:
+	$(sbcl) '(main-test)'
 
 clean:
 	rm -f *~ *.fasl *.ppm *.png

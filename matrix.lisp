@@ -49,7 +49,7 @@
 (defmacro deftransform (transform-name args &body body)
   "Defuns make-transform given TRANSFORM-NAME, using args and the body.
    Requires docstring as part of body.
-   Also defuns do-transform, applying make-transform to another matrix."
+   Also defuns transform, applying make-transform to another matrix."
   (let* ((transform-string (symbol-name transform-name))
          (lower-transform-string (string-downcase transform-string))
          (make-symbol (intern (concatenate 'string "MAKE-" transform-string)))
