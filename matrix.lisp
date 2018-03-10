@@ -55,7 +55,7 @@
          (make-symbol (intern (concatenate 'string "MAKE-" transform-string)))
          (make-doc (concatenate 'string "Makes a matrix that " (pop body)))
          (transform-doc (concatenate 'string "Applies make-"
-                                     lower-transform-string " to TRANSFORM-MATRIX")))
+                                     lower-transform-string " to MATRIX")))
     `(progn
        (defun ,make-symbol ,args
          ,make-doc
@@ -63,9 +63,9 @@
            (to-identity transform)
            ,@body
            transform))
-       (defun ,transform-name ,(append args '(transform-matrix))
+       (defun ,transform-name ,(cons 'matrix args)
          ,transform-doc
-         (matrix-multiply (,make-symbol ,@args) transform-matrix)))))
+         (matrix-multiply (,make-symbol ,@args) matrix)))))
 
 (deftransform translate (delx dely delz)
   "translates by DELX, DELY, and DELZ."
@@ -81,7 +81,7 @@
 
 (defmacro defrotation (rotate-axis axis-0 axis-1)
   "Defines a rotation around ROTATE-AXIS. AXIS-0 and AXIS-1 mark the value of the axes,
-   where x corresponds to 0, y 1, and z 2."
+   where x corresponds to 0, y 1, and z 2. Rotates from AXIS-0 to AXIS-1."
   (let* ((axis-string (symbol-name rotate-axis))
          (lower-axis-string (string-downcase axis-string))
          (rotate-symbol (intern (concatenate 'string "ROTATE-" axis-string)))
@@ -100,9 +100,10 @@
 (defrotation x 1 2)
 (defrotation y 2 0)
 
-(defun rotate (axis degrees transform-matrix)
-  "Rotate TRANSFORM-MATRIX by the rotation matrix with AXIS by DEGREES."
+(defun rotate (matrix axis degrees)
+  "Rotate MATRIX by the rotation matrix with AXIS by DEGREES."
   (case axis
-    (x (rotate-x degrees transform-matrix))
-    (y (rotate-y degrees transform-matrix))
-    (z (rotate-z degrees transform-matrix))))
+    (x (rotate-x matrix degrees))
+    (y (rotate-y matrix degrees))
+    (z (rotate-z matrix degrees))
+    (otherwise (format t "Unknown axis: ~a~%" axis))))
