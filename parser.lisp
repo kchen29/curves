@@ -48,7 +48,9 @@
   (with-open-file (stream filename)
     (do ((line (next-line stream) (next-line stream)))
         ((string= line "quit"))
-      (parse-line line stream edges transform dimensions screen))))
+      (if (valid-command line)
+          (parse-line line stream edges transform dimensions screen)
+          (format t "Unknown command: ~a~%" line)))))
 
 (defun parse-line (line stream edges transform dimensions screen)
   "Parses line according to parse-file."
@@ -73,13 +75,19 @@
           ("save" (draw-lines edges screen '(255 0 255))
                   (apply #'save (string-downcase (symbol-name (first args)))
                          (list dimensions screen))
-                  (clear-screen screen))
-          (otherwise (format t "Unknown command: ~a~%" line))))))
+                  (clear-screen screen))))))
+
+(defun valid-command (line)
+  "Returns t if line is a valid command. Nil otherwise."
+  (member line
+          '("line" "circle" "hermite" "bezier" "ident" "scale" "move" "rotate" "apply" "display" "save")
+          :test #'string=))
 
 (defun command-no-args (line)
   "Returns t if line takes no args. Nil otherwise."
-  (some (lambda (test) (string= line test))
-        '("ident" "apply" "display")))
+  (member line
+          '("ident" "apply" "display")
+          :test #'string=))
 
 (defun next-line (stream)
   "Reads the next line in stream. Returns \"quit\" if eof is reached."
