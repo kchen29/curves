@@ -54,39 +54,33 @@
 
 (defun parse-line (line stream edges transform dimensions screen)
   "Parses line according to parse-file."
-  (if (command-no-args line)
-      (switch line #'string=
-        ("ident" (to-identity transform))
-        ("apply" (matrix-multiply transform edges))
-        ("display" (draw-lines edges screen '(255 0 255))
-                   (display dimensions screen :wait t)
-                   (clear-screen screen)))
-      (let ((args (parse-args (next-line stream))))
-        (switch line #'string=
-          ("line" (apply #'add-edge edges args))
-          ("circle" (apply #'draw-circle edges .01 args))
-          ("hermite" (apply #'draw-hermite edges .01 args))
-          ("bezier" (apply #'draw-bezier edges .01 args))
+  (switch line #'string=
+    ("ident" (to-identity transform))
+    ("apply" (matrix-multiply transform edges))
+    ("display" (draw-lines edges screen '(255 0 255))
+               (display dimensions screen :wait t)
+               (clear-screen screen))
+    (otherwise
+     (let ((args (parse-args (next-line stream))))
+       (switch line #'string=
+         ("line" (apply #'add-edge edges args))
+         ("circle" (apply #'draw-circle edges .01 args))
+         ("hermite" (apply #'draw-hermite edges .01 args))
+         ("bezier" (apply #'draw-bezier edges .01 args))
 
-          ("scale" (apply #'scale transform args))
-          ("move" (apply #'translate transform args))
-          ("rotate" (apply #'rotate transform args))
+         ("scale" (apply #'scale transform args))
+         ("move" (apply #'translate transform args))
+         ("rotate" (apply #'rotate transform args))
 
-          ("save" (draw-lines edges screen '(255 0 255))
-                  (apply #'save (string-downcase (symbol-name (first args)))
-                         (list dimensions screen))
-                  (clear-screen screen))))))
+         ("save" (draw-lines edges screen '(255 0 255))
+                 (apply #'save (string-downcase (symbol-name (first args)))
+                        (list dimensions screen))
+                 (clear-screen screen)))))))
 
 (defun valid-command (line)
   "Returns t if line is a valid command. Nil otherwise."
   (member line
           '("line" "circle" "hermite" "bezier" "ident" "scale" "move" "rotate" "apply" "display" "save")
-          :test #'string=))
-
-(defun command-no-args (line)
-  "Returns t if line takes no args. Nil otherwise."
-  (member line
-          '("ident" "apply" "display")
           :test #'string=))
 
 (defun next-line (stream)
