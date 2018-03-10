@@ -39,20 +39,19 @@
                screen color)))
 
 (defun add-edge (matrix x0 y0 z0 x1 y1 z1)
-  "Adds a line from point (x0 y0 z0) to (x1 y1 z1)."
-  (add-point matrix x0 y0 z0)
-  (add-point matrix x1 y1 z1))
+  "Adds a line from point (x0 y0 z0) to (x1 y1 z1) onto MATRIX.
+   Adjusts the array."
+  (let ((dim (array-dimension matrix 1)))
+    (adjust-array matrix (list 4 (+ 2 dim)))
+    (add-point matrix x0 y0 z0 dim)
+    (add-point matrix x1 y1 z1 (1+ dim))))
 
-(defun add-point (matrix x y &optional (z 0))
-  "Adds a point (x y z) onto MATRIX.
-   Appends the point as a column."
-  (adjust-array matrix (list (array-dimension matrix 0)
-                             (1+ (array-dimension matrix 1))))
-  (let ((end (1- (array-dimension matrix 1))))
-    (setf (aref matrix 0 end) x
-          (aref matrix 1 end) y
-          (aref matrix 2 end) z
-          (aref matrix 3 end) 1)))
+(defun add-point (matrix x y &optional (z 0) (index (1- (array-dimension matrix 1))))
+  "Adds a point (x y z) onto MATRIX at INDEX. Use add-edge."
+  (setf (aref matrix 0 index) x
+        (aref matrix 1 index) y
+        (aref matrix 2 index) z
+        (aref matrix 3 index) 1))
 
 (defun draw-parametric (edges step x-function y-function &optional (z 0))
   "Given X-FUNCTION and Y-FUNCTION, which take one input and outputs the x and y
@@ -96,7 +95,7 @@
   (lambda (s) (evaluate-polynomial s
                                    x0 dx0
                                    (- (* 3 x1) (* 3 x0) (* 2 dx0) dx1)
-                                   (+ (* 2 x0) (- 0 (* 2 x1)) dx0 dx1))))
+                                   (+ (* 2 x0) (* -2 x1) dx0 dx1))))
 
 (defun draw-bezier (edges step x0 y0 x1 y1 x2 y2 x3 y3)
   "Draws a bezier curve to EDGES with endpoints (x0 y0) and (x3 y3).
