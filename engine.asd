@@ -1,8 +1,7 @@
 (defsystem "engine"
-  :serial t
   :components
   ((:file "display")
-   (:file "draw")
    (:file "matrix")
-   (:file "parser")
-   (:file "main")))
+   (:file "draw")
+   (:file "parser" :depends-on ("display" "matrix" "draw"))
+   (:file "main" :depends-on ("parser"))))

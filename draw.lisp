@@ -1,3 +1,10 @@
+(defun plot (x y screen color)
+  "Plots (x, y) on the 2D array SCREEN with COLOR.
+   Floors x and y. Checks bounds. COLOR is not copied."
+  (setf x (round x) y (round y))
+  (when (and (< -1 x (array-dimension screen 0)) (< -1 y (array-dimension screen 1)))
+    (setf (aref screen x y) color)))
+
 (defmacro draw-line-base (x0 y0 x1 y1 plot-1 plot-2)
   "Base code for octant 1. Other octants can be gotten from transformations."
   `(do* ((x ,x0 (1+ x))
