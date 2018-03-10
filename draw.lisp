@@ -76,16 +76,12 @@
                    (lambda (s) (+ (* radius (sin (* 2 pi s))) y))
                    z))
 
-(defmacro polynomial-expand (x &rest coefficients)
-  "Returns a polynomial in X with COEFFICIENTS. Starts from the least power (x^0) and
+(defun evaluate-polynomial (x &rest coefficients)
+  "Evaluates a polynomial in X with COEFFICIENTS. Starts from the least power (x^0) and
    increases with each coefficient."
-  `(+ ,@(loop for coeff in coefficients
-              for i = -1 then (1+ i)
-              if (= i -1)
-                collect coeff
-              else
-                collect `(* ,coeff ,@(loop for j upto i
-                                           collect x)))))
+  (loop for coeff in coefficients
+        for product = 1 then (* x product)
+        sum (* coeff product)))
 
 (defun draw-hermite (edges step x0 y0 x1 y1 dx0 dy0 dx1 dy1)
   "Draws a hermite curve to EDGES with points (x0 y0) and (x1 y1) and the rates wrt. time of
@@ -97,10 +93,10 @@
 (defun get-hermite-cubic (x0 x1 dx0 dx1)
   "Returns the function, given the coordinate (x0 x1) and rates of changes (dx0 dx1),
    taking in a time and returning the output on a hermite cubic curve."
-  (lambda (s) (polynomial-expand s
-                                 x0 dx0
-                                 (- (* 3 x1) (* 3 x0) (* 2 dx0) dx1)
-                                 (+ (* 2 x0) (- 0 (* 2 x1)) dx0 dx1))))
+  (lambda (s) (evaluate-polynomial s
+                                   x0 dx0
+                                   (- (* 3 x1) (* 3 x0) (* 2 dx0) dx1)
+                                   (+ (* 2 x0) (- 0 (* 2 x1)) dx0 dx1))))
 
 (defun draw-bezier (edges step x0 y0 x1 y1 x2 y2 x3 y3)
   "Draws a bezier curve to EDGES with endpoints (x0 y0) and (x3 y3).
@@ -112,7 +108,7 @@
 (defun get-bezier-cubic (x0 x1 x2 x3)
   "Returns the function, given the x coordinates, taking in a time and returning the output
    on a bezier cubic curve."
-  (lambda (s) (polynomial-expand s
-                                 x0 (* 3 (- x1 x0))
-                                 (- (* 3 (+ x0 x2)) (* 6 x1))
-                                 (+ (* 3 (- x1 x2)) (- x3 x0)))))
+  (lambda (s) (evaluate-polynomial s
+                                   x0 (* 3 (- x1 x0))
+                                   (- (* 3 (+ x0 x2)) (* 6 x1))
+                                   (+ (* 3 (- x1 x2)) (- x3 x0)))))

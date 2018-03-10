@@ -19,8 +19,15 @@
      Any command that requires arguments must have those arguments in the second line.
      The commands are as follows:
          line: add a line to the edge matrix -
-	    takes 6 arguments (x0 y0 z0 x1 y1 z1)
-	 ident: set the transform matrix to the identity matrix -
+	    takes 6 arguments (x0 y0 z0 x1 y1 z1)         
+         circle: add a circle to the edge matrix - 
+	    takes 4 arguments (cx, cy, cz, r)
+	 hermite: add a hermite curve to the edge matrix -
+            takes 8 arguments (x0, y0, x1, y1, rx0, ry0, rx1, ry1)
+	 bezier: add a bezier curve to the edge matrix -
+	    takes 8 arguments (x0, y0, x1, y1, x2, y2, x3, y3)
+
+	 ident: set the transform matrix to the identity matrix
 	 scale: create a scale matrix,
 	    then multiply the transform matrix by the scale matrix -
 	    takes 3 arguments (sx sy sz)
@@ -32,6 +39,7 @@
 	    takes 2 arguments (axis theta) axis should be x, y or z.
             Theta is in degrees
 	 apply: apply the current transformation matrix to the edge matrix
+
 	 display: draw the lines of the edge matrix to the screen, then display the screen
 	 save: draw the lines of the edge matrix to the screen
 	    save the screen to a file -
@@ -68,7 +76,8 @@
 
 (defun command-no-args (line)
   "Returns t if line takes no args. Nil otherwise."
-  (or (string= line "ident") (string= line "apply") (string= line "display")))
+  (some (lambda (test) (string= line test))
+        '("ident" "apply" "display")))
 
 (defun next-line (stream)
   "Reads the next line in stream. Returns \"quit\" if eof is reached."
