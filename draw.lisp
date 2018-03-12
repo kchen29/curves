@@ -73,8 +73,8 @@
 (defun draw-circle (edges step x y z radius)
   "Draws a circle to EDGES with center (x y) and RADIUS with STEP interval. Circle shifted by Z."
   (draw-parametric edges step
-                   (lambda (s) (+ (* radius (cos (* 2 pi s))) x))
-                   (lambda (s) (+ (* radius (sin (* 2 pi s))) y))
+                   (lambda (s) (+ x (* radius (cos (* 2 pi s)))))
+                   (lambda (s) (+ y (* radius (sin (* 2 pi s)))))
                    z))
 
 (defun evaluate-polynomial (x &rest coefficients)
