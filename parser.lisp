@@ -80,7 +80,8 @@
 (defun valid-command (line)
   "Returns t if line is a valid command. Nil otherwise."
   (member line
-          '("line" "circle" "hermite" "bezier" "ident" "scale" "move" "rotate" "apply" "display" "save")
+          '("line" "circle" "hermite" "bezier" "ident" "scale"
+            "move" "rotate" "apply" "display" "save")
           :test #'string=))
 
 (defun next-line (stream)
@@ -90,4 +91,3 @@
 (defun parse-args (line)
   "Given LINE (a string), parse it into a list of args."
   (read-from-string (concatenate 'string "(" line ")")))
-

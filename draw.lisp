@@ -1,6 +1,6 @@
 (defun plot (x y screen color)
   "Plots (x, y) on the 2D array SCREEN with COLOR.
-   Floors x and y. Checks bounds. COLOR is not copied."
+   Rounds x and y. Checks bounds. COLOR is not copied."
   (setf x (round x) y (round y))
   (when (and (< -1 x (array-dimension screen 0)) (< -1 y (array-dimension screen 1)))
     (setf (aref screen x y) color)))
@@ -35,30 +35,25 @@
             (draw-line-base y0 x0 (- y0 ydif) x1 y (- (* 2 y0) x))
             (draw-line-base x0 y0 x1 (- y0 ydif) x (- (* 2 y0) y))))))
 
-(defun draw-lines (matrix screen color)
-  "Draws the lines from MATRIX onto SCREEN with COLOR."
-  (do ((index 0 (+ 2 index)))
-      ((>= index (array-dimension matrix 1)))
-    (draw-line (aref matrix 0 index)
-               (aref matrix 1 index)
-               (aref matrix 0 (1+ index))
-               (aref matrix 1 (1+ index))
-               screen color)))
+(defun draw-lines (edges screen color)
+  "Draws the lines from EDGES onto SCREEN with COLOR."
+  (loop while (car edges)
+        for p0 = (pop edges)
+        for p1 = (pop edges)
+        do (draw-line (first p0) (second p0) (first p1) (second p1) screen color)))
 
-(defun add-edge (matrix x0 y0 z0 x1 y1 z1)
-  "Adds a line from point (x0 y0 z0) to (x1 y1 z1) onto MATRIX.
-   Adjusts the array."
-  (let ((dim (array-dimension matrix 1)))
-    (adjust-array matrix (list 4 (+ 2 dim)))
-    (add-point matrix x0 y0 z0 dim)
-    (add-point matrix x1 y1 z1 (1+ dim))))
+(defun add-edge (edges x0 y0 z0 x1 y1 z1)
+  "Adds a line from point (x0 y0 z0) to (x1 y1 z1) to EDGES."
+  (add-point edges x1 y1 z1)
+  (add-point edges x0 y0 z0))
 
-(defun add-point (matrix x y &optional (z 0) (index (1- (array-dimension matrix 1))))
-  "Adds a point (x y z) onto MATRIX at INDEX. Use add-edge."
-  (setf (aref matrix 0 index) x
-        (aref matrix 1 index) y
-        (aref matrix 2 index) z
-        (aref matrix 3 index) 1))
+(defun add-point (edges x y z)
+  "Adds a point (x y z) to EDGES."
+  ;;can't change edges directly, caller's edges would stay the same
+  ;;edges starts out as a cons of nil
+  (when (car edges)
+    (setf (cdr edges) (cons (car edges) (cdr edges))))
+  (setf (car edges) (list x y z 1)))
 
 (defun draw-parametric (edges step x-function y-function &optional (z 0))
   "Given X-FUNCTION and Y-FUNCTION, which take one input and outputs the x and y
